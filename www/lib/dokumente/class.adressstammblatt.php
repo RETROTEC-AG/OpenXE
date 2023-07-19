@@ -119,8 +119,9 @@ class AdressstammblattPDF extends Dokumentenvorlage {
       ', Mobil: ',mobil,
       ', E-Mail: ',email
       ) as 'value' FROM ansprechpartner WHERE adresse='".$adresse['id']."'");
-
-    for($i=0;$i<count($ansprechpartner_tmp);$i++) $ansprechpartner[] = $ansprechpartner_tmp[$i]['value'];
+    
+      $ansprechpartner=[];
+    for($i=0;$i<count($ansprechpartner_tmp ?: []);$i++) $ansprechpartner[] = $ansprechpartner_tmp[$i]['value'];
     if(count($ansprechpartner) > 0)
     { 
       $this->Ln(5);
@@ -132,7 +133,7 @@ class AdressstammblattPDF extends Dokumentenvorlage {
       telefon,email
       FROM lieferadressen WHERE adresse='".$adresse['id']."' ORDER by standardlieferadresse DESC");
 
-    for($i=0;$i<count($lieferadressen_tmp);$i++) {
+    for($i=0;$i<count($lieferadressen_tmp ?: []);$i++) {
       $lieferadressen_tmp[$i]['value']=""; 
       foreach($lieferadressen_tmp[$i] as $key=>$value)
       {
@@ -161,7 +162,7 @@ class AdressstammblattPDF extends Dokumentenvorlage {
       $lieferadressen[] = $lieferadressen_tmp[$i]['value'].$standard;
     }
    
-    if(count($lieferadressen) > 0)
+    if(count($lieferadressen ?: []) > 0)
     { 
       $this->Ln(5);
       $this->renderHeading("Lieferadressen",8);
