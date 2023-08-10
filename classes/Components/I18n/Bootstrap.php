@@ -113,6 +113,8 @@ final class Bootstrap
         $db = $container->get('Database');
         
         $config=[];
+        $firmaLang=null;
+        $firmaRegion=null;
         // Get language from system settings and normalize to 3-letter-code and 2-letter-code
         if ($firmaLang = self::findLanguage(strval($app->erp->Firmendaten('preferredLanguage')))) {
             $config[Localization::LANGUAGE_DEFAULT] = $firmaLang[Iso639\Key::ALPHA_3];
