@@ -155,4 +155,12 @@ final class Bootstrap
         $locale=$localization->getLocale();
         return new FormatterService($locale);
     }
+    
+    
+    public static function onInitFormatterService(ServiceContainer $container): FormatterService
+    {
+        $localization=$container->get('Localization');
+        $locale=$localization->getLocale();
+        return new FormatterService($locale);
+    }
 }
