@@ -28,6 +28,7 @@ final class Bootstrap
     {
         return [
             'Localization' => 'onInitLocalization',
+            'FormatterService' => 'onInitFormatterService',
         ];
     }
     
@@ -145,5 +146,13 @@ final class Bootstrap
         
         // Create Localization object
         return new Localization($request, $session, $usersettings, $config);
+    }
+    
+    
+    public static function onInitFormatterService(ServiceContainer $container): FormatterService
+    {
+        $localization=$container->get('Localization');
+        $locale=$localization->getLocale();
+        return new FormatterService($locale);
     }
 }
