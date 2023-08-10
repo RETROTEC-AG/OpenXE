@@ -28,7 +28,6 @@ final class Bootstrap
     {
         return [
             'Localization' => 'onInitLocalization',
-            'FormatterService' => 'onInitFormatterService',
         ];
     }
     
