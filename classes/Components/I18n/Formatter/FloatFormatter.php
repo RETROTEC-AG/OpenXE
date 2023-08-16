@@ -43,7 +43,7 @@ class FloatFormatter extends AbstractFormatter implements FormatterInterface
     {
         $this->setOriginalInput($input);
         
-        $input = trim(strtolower($input), "abcdefghijklmnopqrstuvwxyz \t\n\r\0\x0B");
+        $input = trim(strtolower(stripslashes($input)), "abcdefghijklmnopqrstuvwxyz \t\n\r\0\x0B");
         
         if (empty($input)) {
             // No input
@@ -58,14 +58,13 @@ class FloatFormatter extends AbstractFormatter implements FormatterInterface
 //            return $this;
 //        }
         
-        $fmt = new \NumberFormatter($this->getLocale(), \NumberFormatter::DECIMAL);
-        if (!$output = $this->getNumberFormatter()->parse($input)) {
+        if (($output = $this->getNumberFormatter()->parse($input)) === false) {
             // could not parse number
             // as a last resort, try to parse the number with locale de_DE
             // This is necessary, because of many str_replace, where dot is replaced with comma
             $fmtLr = new \NumberFormatter('de_DE', \NumberFormatter::DECIMAL);
             if (!$output = $fmtLr->parse($input)) {
-                throw new \RuntimeException("{$fmt->getErrorMessage()}. \$input={$input}");
+                throw new \RuntimeException("{$this->getNumberFormatter()->getErrorMessage()}. \$input={$input}");
             }
         }
         
@@ -175,6 +174,7 @@ class FloatFormatter extends AbstractFormatter implements FormatterInterface
     {
         if (!isset($this->numberFormatter)) {
             $this->numberFormatter = new \NumberFormatter($this->getLocale(), \NumberFormatter::DECIMAL);
+            $this->numberFormatter->setAttribute(\NumberFormatter::LENIENT_PARSE, 1);
         }
         return $this->numberFormatter;
     }
