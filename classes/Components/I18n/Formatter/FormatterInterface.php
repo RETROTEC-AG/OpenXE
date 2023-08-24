@@ -70,4 +70,15 @@ interface FormatterInterface
      * @return string
      */
     public function formatForUserWithSqlStatement(string $col): string;
+    
+    
+    
+    /**
+     * Test $input for the correct (strict) type the class supports. Return false otherwise.
+     *
+     * @param mixed $input
+     *
+     * @return bool
+     */
+    public function isStrictValidPhpVal($input): bool;
 }

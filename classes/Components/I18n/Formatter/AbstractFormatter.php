@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace Xentral\Components\I18n\Formatter;
 
+use Vtiful\Kernel\Format;
+use Xentral\Components\I18n\Formatter\Exception\TypeErrorException;
+
 /**
  * AbstractFormatter.
  *
@@ -16,14 +19,16 @@ namespace Xentral\Components\I18n\Formatter;
 abstract class AbstractFormatter implements FormatterInterface
 {
     private string $locale;
+    private FormatterMode $strictness;
     private mixed $originalInput;
     private mixed $parsedValue;
     
     
     
-    public function __construct(string $locale)
+    public function __construct(string $locale, FormatterMode $strictness = FormatterMode::MODE_STRICT)
     {
         $this->locale = $locale;
+        $this->strictness = $strictness;
         $this->init();
     }
     
@@ -58,16 +63,26 @@ abstract class AbstractFormatter implements FormatterInterface
     
     /**
      * Set the native PHP value in the formatter.
-     * The value must ALWAYS be of the requested type or an Exception is thrown.
+     * The value must ALWAYS be of the requested type (or NULL or '' depending on the strictness).
      *
      * @param mixed $input
      *
      * @return self
      */
-    public function setPhpVal($input): self
+    public function setPhpVal(mixed $input): self
     {
-        $this->parsedValue = $input;
-        return $this;
+        if ($this->isStrictValidPhpVal($input)
+            || $this->isEmptyValidPhpValue($input)
+            || $this->isNullValidPhpValue($input)) {
+            $this->parsedValue = $input;
+            return $this;
+        } else {
+            throw new TypeErrorException(
+                "Value " . var_export($input, true) . " is not a valid type for " . get_class(
+                    $this
+                ) . " with strictness {$this->getStrictness()->name}"
+            );
+        }
     }
     
     
@@ -99,7 +114,9 @@ abstract class AbstractFormatter implements FormatterInterface
     
     /**
      * Store original value before parsing.
+     *
      * @depracated
+     *
      * @param $input
      *
      * @return $this
@@ -109,4 +126,33 @@ abstract class AbstractFormatter implements FormatterInterface
         $this->originalInput = $input;
         return $this;
     }
+    
+    
+    
+    /**
+     * Return the current strictness mode.
+     *
+     * @return FormatterMode
+     * @see FormatterMode
+     *
+     */
+    public function getStrictness(): FormatterMode
+    {
+        return $this->strictness;
+    }
+    
+    
+    
+    protected function isNullValidPhpValue(mixed $input): bool
+    {
+        return ($this->getStrictness() == FormatterMode::MODE_NULL) && ($input === null);
+    }
+    
+    
+    
+    protected function isEmptyValidPhpValue(mixed $input): bool
+    {
+        return ($this->getStrictness() == FormatterMode::MODE_EMPTY) && is_string($input) && (trim($input) === '');
+    }
+    
 }
